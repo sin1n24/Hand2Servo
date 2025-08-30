@@ -3,19 +3,101 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <head>
-      <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
-      <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
-      <script type="modele" src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.js"crossorigin="anonymous"></script>
-    </head>
-
     <title>Mediapipe Handpose Example</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: sans-serif;
+        display: flex;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+      }
 
+      #container {
+        display: flex;
+        flex-grow: 1;
+      }
+
+      #webcam-container {
+        flex: 3;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-color: #000;
+      }
+
+      #output_canvas {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+      }
+
+      #info-container {
+        flex: 1;
+        padding: 1em;
+        display: flex;
+        flex-direction: column;
+        gap: 1em;
+        background-color: #f0f0f0;
+        overflow-y: auto;
+      }
+
+      .info-box {
+        border: 1px solid #ccc;
+        padding: 1em;
+        border-radius: 5px;
+        background-color: #fff;
+      }
+
+      h2 {
+        margin-top: 0;
+        font-size: 1.2em;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 0.5em;
+      }
+
+      /* Portrait mode */
+      @media (max-width: 768px), (orientation: portrait) {
+        #container {
+          flex-direction: column;
+        }
+        #webcam-container {
+          flex: 2; /* Give more space to webcam in portrait */
+        }
+        #info-container {
+          flex: 1;
+        }
+      }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.js" crossorigin="anonymous"></script>
     <!-- The website JavaScript file -->
     <script type="module" src="./main.js" defer></script>
   </head>
   <body>
-    <video id="input_video" style="display:none"></video>
-    <canvas id="output_canvas" width="1280px" height="720px"></canvas>
+    <div id="container">
+      <div id="webcam-container">
+        <video id="input_video" style="display:none"></video>
+        <canvas id="output_canvas"></canvas>
+      </div>
+      <div id="info-container">
+          <div id="finger-angles-container" class="info-box">
+              <h2>Finger Angles</h2>
+              <p>Thumb (2-1-0): 0°</p>
+              <p>Index finger (6-5-0): 0°</p>
+              <p>Middle finger (10-9-0): 0°</p>
+              <p>Ring finger (14-13-0): 0°</p>
+              <p>Little finger (18-17-0): 0°</p>
+          </div>
+          <div id="serial-connection-container" class="info-box">
+              <h2>Serial Connection</h2>
+              <div id="serial-output">
+                <!-- Serial output will appear here -->
+              </div>
+          </div>
+      </div>
+    </div>
   </body>
 </html>
