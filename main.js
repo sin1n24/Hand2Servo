@@ -131,6 +131,69 @@ const init = async () =>{
       alert("Sorry, your browser does not support the camera API.");
     }
   });
+  const startSerialButton = document.getElementById("start-serial-button");
+  const stopSerialButton = document.getElementById("stop-serial-button");
+  const serialOutput = document.getElementById("serial-output");
+
+  let port;
+  let writer;
+  let sendInterval;
+
+  startSerialButton.addEventListener("click", async () => {
+    if ("serial" in navigator) {
+      try {
+        port = await navigator.serial.requestPort();
+        await port.open({ baudRate: 9600 });
+
+        startSerialButton.style.display = "none";
+        stopSerialButton.style.display = "inline-block";
+        serialOutput.textContent = "Serial connection started. Sending '0'...";
+
+        const encoder = new TextEncoder();
+        writer = port.writable.getWriter();
+
+        sendInterval = setInterval(async () => {
+          try {
+            await writer.write(encoder.encode("0"));
+          } catch (error) {
+            console.error("Error writing to serial port:", error);
+            serialOutput.textContent = `Error: ${error.message}`;
+            clearInterval(sendInterval);
+            // The port might have been closed, so we should clean up
+            await writer.close();
+            await port.close();
+            startSerialButton.style.display = "inline-block";
+            stopSerialButton.style.display = "none";
+          }
+        }, 1000); // Sending "0" every second
+
+      } catch (error) {
+        console.error("Error with serial connection:", error);
+        serialOutput.textContent = `Error: ${error.message}`;
+      }
+    } else {
+      alert("Web Serial API not supported in this browser.");
+      serialOutput.textContent = "Web Serial API not supported.";
+    }
+  });
+
+  stopSerialButton.addEventListener("click", async () => {
+    if (sendInterval) {
+      clearInterval(sendInterval);
+      sendInterval = null;
+    }
+    if (writer) {
+      await writer.close();
+      writer = null;
+    }
+    if (port) {
+      await port.close();
+      port = null;
+    }
+    startSerialButton.style.display = "inline-block";
+    stopSerialButton.style.display = "none";
+    serialOutput.textContent = "Serial connection stopped.";
+  });
 }
 
 
