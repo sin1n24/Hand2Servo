@@ -11,22 +11,18 @@ This project uses MediaPipe's Hand Landmarker to perform real-time hand tracking
 
 ## How to Run
 
-1.  Clone this repository.
-2.  You need a local web server to run this project due to browser security policies (CORS). A simple way to do this is to use Python's built-in HTTP server.
-    -   If you have Python 3, run the following command in the project's root directory:
-        ```bash
-        python -m http.server
-        ```
-    -   If you have Python 2, use:
-        ```bash
-        python -m SimpleHTTPServer
-        ```
-3.  Open your web browser and navigate to `http://localhost:8000` (or the port specified by your server).
-4.  Click the "Start Camera" button to begin hand tracking.
-5.  To send data over serial, connect a compatible device and click the "Start Serial" button.
+This project is deployed using GitHub Pages. You can try the live demo by accessing the `index.html` file through your GitHub Pages URL for this repository.
+
+The application can be accessed directly via GitHub Pages at the following link:
+
+[**Live Demo (./index.html)**](./index.html)
+
+Once the page is loaded:
+1.  Click the "Start Camera" button and grant camera permissions.
+2.  To send data over serial, connect a compatible device and click the "Start Serial" button.
 
 ## Reference
 
-This project was created with reference to the following article:
+This project was created with great reference to the following article. My heartfelt thanks to the author for the valuable information.
 
 -   [ブラウザだけで始めるハンドトラッキング - Zenn](https://zenn.dev/tkada/articles/600efba2db186b)
