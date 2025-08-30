@@ -35,11 +35,16 @@ const init = async () =>{
 
   let lastVideoTime = -1;
 
-  const calculateDistance = (p1, p2) => {
-    const dx = p2.x - p1.x;
-    const dy = p2.y - p1.y;
-    const dz = p2.z - p1.z;
-    return Math.sqrt(dx * dx + dy * dy + dz * dz);
+  const calculateAngle = (p1, p2, p3) => {
+    const v1 = { x: p1.x - p2.x, y: p1.y - p2.y, z: p1.z - p2.z };
+    const v2 = { x: p3.x - p2.x, y: p3.y - p2.y, z: p3.z - p2.z };
+
+    const dotProduct = v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+    const magnitudeV1 = Math.sqrt(v1.x * v1.x + v1.y * v1.y + v1.z * v1.z);
+    const magnitudeV2 = Math.sqrt(v2.x * v2.x + v2.y * v2.y + v2.z * v2.z);
+
+    const angle = Math.acos(dotProduct / (magnitudeV1 * magnitudeV2));
+    return angle * (180 / Math.PI);
   };
 
   const fingerInfoElements = {
@@ -73,25 +78,26 @@ const init = async () =>{
         drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, { color: "#00FF00", lineWidth: 5 });
         drawLandmarks(canvasCtx, landmarks, { color: "#FF0000", lineWidth: 2 });
 
-        // Define finger landmark pairs
-        const fingerPairs = {
-          thumb: [2, 1],
-          index: [6, 5],
-          middle: [10, 9],
-          ring: [14, 13],
-          little: [18, 17],
+        // Define finger landmark triplets
+        const fingerTriplets = {
+          thumb: [2, 1, 0],
+          index: [6, 5, 0],
+          middle: [10, 9, 0],
+          ring: [14, 13, 0],
+          little: [18, 17, 0],
         };
 
-        // Calculate and display lengths
-        for (const finger in fingerPairs) {
-          const [p1_idx, p2_idx] = fingerPairs[finger];
+        // Calculate and display angles
+        for (const finger in fingerTriplets) {
+          const [p1_idx, p2_idx, p3_idx] = fingerTriplets[finger];
           const p1 = landmarks[p1_idx];
           const p2 = landmarks[p2_idx];
-          const length = calculateDistance(p1, p2) * 100; // Scale for better readability
+          const p3 = landmarks[p3_idx];
+          const angle = calculateAngle(p1, p2, p3);
 
           const infoElement = fingerInfoElements[finger];
-          const originalText = initialFingerInfo[finger];
-          infoElement.textContent = `${originalText} Length: ${length.toFixed(2)}`;
+          const originalText = initialFingerInfo[finger].split(':')[0];
+          infoElement.textContent = `${originalText}: ${angle.toFixed(0)}°`;
         }
       }
       canvasCtx.restore();
