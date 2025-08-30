@@ -35,6 +35,26 @@ const init = async () =>{
 
   let lastVideoTime = -1;
 
+  const calculateDistance = (p1, p2) => {
+    const dx = p2.x - p1.x;
+    const dy = p2.y - p1.y;
+    const dz = p2.z - p1.z;
+    return Math.sqrt(dx * dx + dy * dy + dz * dz);
+  };
+
+  const fingerInfoElements = {
+    thumb: document.getElementById("thumb-info"),
+    index: document.getElementById("index-info"),
+    middle: document.getElementById("middle-info"),
+    ring: document.getElementById("ring-info"),
+    little: document.getElementById("little-info"),
+  };
+
+  const initialFingerInfo = {};
+  for (const finger in fingerInfoElements) {
+    initialFingerInfo[finger] = fingerInfoElements[finger].textContent;
+  }
+
   const renderLoop = () => {
     canvasElement.width = video.videoWidth;
     canvasElement.height = video.videoHeight;
@@ -46,13 +66,32 @@ const init = async () =>{
       canvasCtx.save();
       canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
       canvasCtx.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
-      if (results.landmarks) {
-        for (const landmarks of results.landmarks) {
-          drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, {
-            color: "#00FF00",
-            lineWidth: 5
-          });
-          drawLandmarks(canvasCtx, landmarks, { color: "#FF0000", lineWidth: 2 });
+      if (results.landmarks && results.landmarks.length > 0) {
+        const landmarks = results.landmarks[0]; // Assuming one hand for simplicity
+
+        // Draw landmarks and connectors
+        drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, { color: "#00FF00", lineWidth: 5 });
+        drawLandmarks(canvasCtx, landmarks, { color: "#FF0000", lineWidth: 2 });
+
+        // Define finger landmark pairs
+        const fingerPairs = {
+          thumb: [2, 1],
+          index: [6, 5],
+          middle: [10, 9],
+          ring: [14, 13],
+          little: [18, 17],
+        };
+
+        // Calculate and display lengths
+        for (const finger in fingerPairs) {
+          const [p1_idx, p2_idx] = fingerPairs[finger];
+          const p1 = landmarks[p1_idx];
+          const p2 = landmarks[p2_idx];
+          const length = calculateDistance(p1, p2) * 100; // Scale for better readability
+
+          const infoElement = fingerInfoElements[finger];
+          const originalText = initialFingerInfo[finger];
+          infoElement.textContent = `${originalText} Length: ${length.toFixed(2)}`;
         }
       }
       canvasCtx.restore();
