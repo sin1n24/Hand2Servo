@@ -6,6 +6,8 @@ import {
 import Stats  from 'https://cdnjs.cloudflare.com/ajax/libs/stats.js/r17/Stats.min.js';
 
 const init = async () =>{
+  let fingerAngles = [0, 0, 0, 0, 0]; // Array to store finger angles
+
   const stats = new Stats();
   document.body.appendChild(stats.dom);
   
@@ -88,12 +90,16 @@ const init = async () =>{
         };
 
         // Calculate and display angles
+        let fingerIndex = 0;
         for (const finger in fingerTriplets) {
           const [p1_idx, p2_idx, p3_idx] = fingerTriplets[finger];
           const p1 = landmarks[p1_idx];
           const p2 = landmarks[p2_idx];
           const p3 = landmarks[p3_idx];
           const angle = calculateAngle(p1, p2, p3);
+
+          fingerAngles[fingerIndex] = Math.round(angle);
+          fingerIndex++;
 
           const infoElement = fingerInfoElements[finger];
           const originalText = initialFingerInfo[finger].split(':')[0];
@@ -154,7 +160,8 @@ const init = async () =>{
 
         sendInterval = setInterval(async () => {
           try {
-            await writer.write(encoder.encode("0"));
+            const angleString = fingerAngles.join(',') + '\n';
+            await writer.write(encoder.encode(angleString));
           } catch (error) {
             console.error("Error writing to serial port:", error);
             serialOutput.textContent = `Error: ${error.message}`;
