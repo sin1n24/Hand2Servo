@@ -154,7 +154,7 @@ const init = async () =>{
 
         sendInterval = setInterval(async () => {
           try {
-            await writer.write(encoder.encode("0"));
+            await writer.write(encoder.encode("0,0,0,0"));
           } catch (error) {
             console.error("Error writing to serial port:", error);
             serialOutput.textContent = `Error: ${error.message}`;
