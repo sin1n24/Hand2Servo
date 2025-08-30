@@ -15,11 +15,12 @@ This project is deployed using GitHub Pages. You can try the live demo by access
 
 The application can be accessed directly via GitHub Pages at the following link:
 
-[**Live Demo (./index.html)**](./index.html)
+[**Live Demo**](https://sin1n24.github.io/Hand2Servo/)
 
 Once the page is loaded:
 1.  Click the "Start Camera" button and grant camera permissions.
 2.  To send data over serial, connect a compatible device and click the "Start Serial" button.
+3.  The serial port will receive a comma-separated string of numbers every second (e.g., `90,180,180,180,180`). These numbers represent the calculated angles for the thumb, index, middle, ring, and little finger, respectively.
 
 ## Reference
 
