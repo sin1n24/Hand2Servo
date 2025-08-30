@@ -7,26 +7,15 @@ import Stats  from 'https://cdnjs.cloudflare.com/ajax/libs/stats.js/r17/Stats.mi
 
 const init = async () =>{
   const stats = new Stats();
-    document.body.appendChild(stats.dom);
+  document.body.appendChild(stats.dom);
   
   const video = document.getElementById("input_video");
   const canvasElement = document.getElementById("output_canvas"); 
   const canvasCtx = canvasElement.getContext("2d");
+  const startButton = document.getElementById("start-camera-button");
 
-  if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-    navigator.mediaDevices
-      .getUserMedia({ video: true })
-      .then(function (stream) {
-        video.srcObject = stream;
-        video.play();
-      })
-      .catch(function (error) {
-        console.error("Error accessing the camera: ", error);
-      });
-  } else {
-    alert("Sorry, your browser does not support the camera API.");
-  }
-  
+  canvasElement.style.display = "none";
+
   const vision = await FilesetResolver.forVisionTasks(
     // path/to/wasm/root
     "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
@@ -45,8 +34,7 @@ const init = async () =>{
   await handLandmarker.setOptions({ runningMode: "video" });
 
   let lastVideoTime = -1;
-  
-  
+
   const renderLoop = () => {
     canvasElement.width = video.videoWidth;
     canvasElement.height = video.videoHeight;
@@ -76,9 +64,28 @@ const init = async () =>{
       stats.end();
     });
   }
-  
-  renderLoop();
-  
+
+  startButton.addEventListener("click", () => {
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      navigator.mediaDevices
+        .getUserMedia({ video: true })
+        .then(function (stream) {
+          video.srcObject = stream;
+          video.addEventListener("loadeddata", () => {
+            startButton.style.display = "none";
+            canvasElement.style.display = "block";
+            renderLoop();
+          });
+          video.play();
+        })
+        .catch(function (error) {
+          console.error("Error accessing the camera: ", error);
+          alert("Error accessing the camera. Please check permissions and try again.");
+        });
+    } else {
+      alert("Sorry, your browser does not support the camera API.");
+    }
+  });
 }
 
 
