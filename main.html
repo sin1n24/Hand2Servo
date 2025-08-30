@@ -20,11 +20,18 @@
       }
 
       #webcam-container {
-        flex: 3;
+        flex: 2;
         display: flex;
+        padding: 1em;
+        background-color: #f0f0f0;
+      }
+
+      #webcam-box {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
         justify-content: center;
         align-items: center;
-        background-color: #000;
       }
 
       #output_canvas {
@@ -79,8 +86,12 @@
   <body>
     <div id="container">
       <div id="webcam-container">
-        <video id="input_video" style="display:none"></video>
-        <canvas id="output_canvas"></canvas>
+        <div id="webcam-box" class="info-box">
+          <h2>WebCam</h2>
+          <button id="start-camera-button">Start Camera</button>
+          <video id="input_video" style="display:none"></video>
+          <canvas id="output_canvas"></canvas>
+        </div>
       </div>
       <div id="info-container">
           <div id="finger-angles-container" class="info-box">
