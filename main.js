@@ -6,6 +6,8 @@ import {
 import Stats  from 'https://cdnjs.cloudflare.com/ajax/libs/stats.js/r17/Stats.min.js';
 
 const init = async () =>{
+  let fingerAngles = [0, 0, 0, 0, 0]; // Array to store finger angles
+
   const stats = new Stats();
   document.body.appendChild(stats.dom);
   
@@ -88,12 +90,16 @@ const init = async () =>{
         };
 
         // Calculate and display angles
+        let fingerIndex = 0;
         for (const finger in fingerTriplets) {
           const [p1_idx, p2_idx, p3_idx] = fingerTriplets[finger];
           const p1 = landmarks[p1_idx];
           const p2 = landmarks[p2_idx];
           const p3 = landmarks[p3_idx];
           const angle = calculateAngle(p1, p2, p3);
+
+          fingerAngles[fingerIndex] = Math.round(angle);
+          fingerIndex++;
 
           const infoElement = fingerInfoElements[finger];
           const originalText = initialFingerInfo[finger].split(':')[0];
@@ -130,6 +136,70 @@ const init = async () =>{
     } else {
       alert("Sorry, your browser does not support the camera API.");
     }
+  });
+  const startSerialButton = document.getElementById("start-serial-button");
+  const stopSerialButton = document.getElementById("stop-serial-button");
+  const serialOutput = document.getElementById("serial-output");
+
+  let port;
+  let writer;
+  let sendInterval;
+
+  startSerialButton.addEventListener("click", async () => {
+    if ("serial" in navigator) {
+      try {
+        port = await navigator.serial.requestPort();
+        await port.open({ baudRate: 9600 });
+
+        startSerialButton.style.display = "none";
+        stopSerialButton.style.display = "inline-block";
+        serialOutput.textContent = "Serial connection started. Sending '0'...";
+
+        const encoder = new TextEncoder();
+        writer = port.writable.getWriter();
+
+        sendInterval = setInterval(async () => {
+          try {
+            const angleString = fingerAngles.join(',') + '\n';
+            await writer.write(encoder.encode(angleString));
+          } catch (error) {
+            console.error("Error writing to serial port:", error);
+            serialOutput.textContent = `Error: ${error.message}`;
+            clearInterval(sendInterval);
+            // The port might have been closed, so we should clean up
+            await writer.close();
+            await port.close();
+            startSerialButton.style.display = "inline-block";
+            stopSerialButton.style.display = "none";
+          }
+        }, 1000); // Sending "0" every second
+
+      } catch (error) {
+        console.error("Error with serial connection:", error);
+        serialOutput.textContent = `Error: ${error.message}`;
+      }
+    } else {
+      alert("Web Serial API not supported in this browser.");
+      serialOutput.textContent = "Web Serial API not supported.";
+    }
+  });
+
+  stopSerialButton.addEventListener("click", async () => {
+    if (sendInterval) {
+      clearInterval(sendInterval);
+      sendInterval = null;
+    }
+    if (writer) {
+      await writer.close();
+      writer = null;
+    }
+    if (port) {
+      await port.close();
+      port = null;
+    }
+    startSerialButton.style.display = "inline-block";
+    stopSerialButton.style.display = "none";
+    serialOutput.textContent = "Serial connection stopped.";
   });
 }
 
