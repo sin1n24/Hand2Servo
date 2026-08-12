@@ -27,3 +27,7 @@ Once the page is loaded:
 This project was created with great reference to the following article. My heartfelt thanks to the author for the valuable information.
 
 -   [ブラウザだけで始めるハンドトラッキング - Zenn](https://zenn.dev/tkada/articles/600efba2db186b)
+
+## License
+
+This project's code is licensed under the MIT License (see `LICENSE`). `hand_landmarker.task` is Google's MediaPipe model, licensed under Apache-2.0.
