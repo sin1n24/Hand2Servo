@@ -3,7 +3,7 @@ import {
   FilesetResolver
 } from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0";
 
-import Stats  from 'https://cdnjs.cloudflare.com/ajax/libs/stats.js/r17/Stats.min.js';
+import Stats  from 'https://cdn.jsdelivr.net/npm/stats.js@0.17.0/+esm';
 
 const init = async () =>{
   let fingerAngles = [0, 0, 0, 0, 0]; // Array to store finger angles
@@ -20,17 +20,17 @@ const init = async () =>{
 
   const vision = await FilesetResolver.forVisionTasks(
     // path/to/wasm/root
-    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@latest/wasm"
+    "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.0/wasm"
   );
 
   const handLandmarker = await HandLandmarker.createFromOptions(
       vision,
       {
         baseOptions: {
-          modelAssetPath: "./hand_landmarker.task", //.taskƒtƒ@ƒCƒ‹‚ğw’è‚·‚é
-          delegate: "CPU" //CPU or GPU‚Åˆ—‚·‚é‚©‚ğw’è‚·‚é
+          modelAssetPath: "./hand_landmarker.task", // .taskãƒ¢ãƒ‡ãƒ«ãƒ•ã‚¡ã‚¤ãƒ«ã‚’æŒ‡å®š
+          delegate: "CPU" // CPU ã‹ GPU ã§å‡¦ç†ã™ã‚‹ã‹ã‚’æŒ‡å®š
         },
-        numHands: 2 //”F¯‚Å‚«‚éè‚Ì”
+        numHands: 2 // èªè­˜ã™ã‚‹æ‰‹ã®æœ€å¤§æ•°
       });
   
   await handLandmarker.setOptions({ runningMode: "video" });
@@ -63,8 +63,10 @@ const init = async () =>{
   }
 
   const renderLoop = () => {
-    canvasElement.width = video.videoWidth;
-    canvasElement.height = video.videoHeight;
+    if (canvasElement.width !== video.videoWidth || canvasElement.height !== video.videoHeight) {
+      canvasElement.width = video.videoWidth;
+      canvasElement.height = video.videoHeight;
+    }
     let startTimeMs = performance.now();
     if (video.currentTime > 0 && video.currentTime !== lastVideoTime) {
       const results = handLandmarker.detectForVideo(video,startTimeMs);
@@ -172,7 +174,7 @@ const init = async () =>{
             startSerialButton.style.display = "inline-block";
             stopSerialButton.style.display = "none";
           }
-        }, 1000); // Sending "0" every second
+        }, 1000); // æŒ‡ã®è§’åº¦CSVã‚’1ç§’ã”ã¨ã«é€ä¿¡
 
       } catch (error) {
         console.error("Error with serial connection:", error);
